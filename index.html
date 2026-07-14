@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内容发布助手 - 一键复制推广内容</title>
+    <meta name="description" content="推广内容一键复制发布助手，支持小红书、知乎、微信公众号、抖音等多平台">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --xhs: #fe2c55;
+            --zhihu: #0066ff;
+            --wechat: #07c160;
+            --douyin: #111;
+            --bilibili: #00a1d6;
+            --weibo: #e6162d;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        .header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        .header p { opacity: 0.9; font-size: 0.95rem; }
+        
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 1rem;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-num {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Quick Links */
+        .quick-links {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem;
+            overflow-x: auto;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .quick-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: white;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .quick-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .quick-link.xhs { background: var(--xhs); }
+        .quick-link.zhihu { background: var(--zhihu); }
+        .quick-link.wechat { background: var(--wechat); }
+        .quick-link.douyin { background: var(--douyin); }
+        .quick-link.bilibili { background: var(--bilibili); }
+        .quick-link.weibo { background: var(--weibo); }
+        
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .filter-btn {
+            padding: 0.4rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            background: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        
+        /* Content List */
+        .content-list {
+            max-width: 800px;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        /* Content Card */
+        .content-card {
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .content-card:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .platform-badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+        }
+        .project-name {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .card-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .status-badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-done { background: #d1fae5; color: #065f46; }
+        
+        .card-title {
+            padding: 1rem 1.2rem 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+        .card-preview {
+            padding: 0 1.2rem 1rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-height: 100px;
+            overflow: hidden;
+            position: relative;
+        }
+        .card-preview.expanded {
+            max-height: none;
+        }
+        .expand-btn {
+            padding: 0.3rem 1.2rem 0.8rem;
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        
+        /* Full Content Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-header {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+            border-radius: 16px 16px 0 0;
+        }
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--bg);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-body {
+            padding: 1.5rem;
+        }
+        .modal-body pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: inherit;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            color: var(--text);
+        }
+        
+        /* Action Buttons */
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.8rem 1.2rem;
+            border-top: 1px solid var(--border);
+            background: #fafbfc;
+            flex-wrap: wrap;
+        }
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-copy {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-copy:hover { background: var(--primary-hover); }
+        .btn-copy.copied {
+            background: var(--success);
+        }
+        .btn-publish {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        .btn-publish:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-done {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .btn-done:hover { border-color: var(--success); color: var(--success); }
+        .btn-done.is-done {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+        
+        /* Publish Dropdown */
+        .publish-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            min-width: 160px;
+            z-index: 50;
+            margin-bottom: 4px;
+        }
+        .dropdown-menu.show { display: block; }
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+            color: var(--text);
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .dropdown-item:hover { background: var(--bg); }
+        .dropdown-item:first-child { border-radius: 8px 8px 0 0; }
+        .dropdown-item:last-child { border-radius: 0 0 8px 8px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .dot.xhs { background: var(--xhs); }
+        .dot.zhihu { background: var(--zhihu); }
+        .dot.wechat { background: var(--wechat); }
+        .dot.douyin { background: var(--douyin); }
+        .dot.bilibili { background: var(--bilibili); }
+        .dot.weibo { background: var(--weibo); }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: var(--text-secondary);
+        }
+        .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+        .empty-state h3 { margin-bottom: 0.5rem; color: var(--text); }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1e293b;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            z-index: 200;
+            transition: transform 0.3s ease;
+            white-space: nowrap;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        
+        /* Responsive */
+        @media (max-width: 640px) {
+            .header h1 { font-size: 1.4rem; }
+            .stats-bar { gap: 1rem; }
+            .card-actions { flex-direction: column; }
+            .action-btn { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📢 内容发布助手</h1>
+        <p>一键复制推广内容，快速发布到各平台</p>
+    </div>
+    
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-num" id="totalContent">0</div>
+            <div class="stat-label">总内容</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num" id="pendingContent">0</div>
+            <div class="stat-label">待发布</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num" id="doneContent">0</div>
+            <div class="stat-label">已发布</div>
+        </div>
+    </div>
+    
+    <div class="quick-links">
+        <a class="quick-link xhs" href="https://creator.xiaohongshu.com/publish/publish" target="_blank">📕 小红书</a>
+        <a class="quick-link zhihu" href="https://www.zhihu.com/creator" target="_blank">📘 知乎</a>
+        <a class="quick-link wechat" href="https://mp.weixin.qq.com/" target="_blank">💚 微信公众号</a>
+        <a class="quick-link douyin" href="https://creator.douyin.com/creator-micro/content/upload" target="_blank">🎵 抖音</a>
+        <a class="quick-link bilibili" href="https://member.bilibili.com/platform/upload/text" target="_blank">📺 B站</a>
+        <a class="quick-link weibo" href="https://weibo.com" target="_blank">🔴 微博</a>
+    </div>
+    
+    <div class="filters">
+        <button class="filter-btn active" data-filter="all">全部</button>
+        <button class="filter-btn" data-filter="xhs">小红书</button>
+        <button class="filter-btn" data-filter="zhihu">知乎</button>
+        <button class="filter-btn" data-filter="douyin">短视频</button>
+        <button class="filter-btn" data-filter="wechat">公众号</button>
+        <button class="filter-btn" data-filter="pending">待发布</button>
+        <button class="filter-btn" data-filter="done">已发布</button>
+    </div>
+    
+    <div class="content-list" id="contentList"></div>
+    
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">内容详情</h3>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <pre id="modalContent"></pre>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+    
+    <script src="data.js"></script>
+    <script>
+        // Platform config
+        const PLATFORMS = {
+            xhs: { name: '小红书', color: '#fe2c55', url: 'https://creator.xiaohongshu.com/publish/publish' },
+            zhihu: { name: '知乎', color: '#0066ff', url: 'https://www.zhihu.com/creator' },
+            wechat: { name: '微信公众号', color: '#07c160', url: 'https://mp.weixin.qq.com/' },
+            douyin: { name: '抖音', color: '#111', url: 'https://creator.douyin.com/creator-micro/content/upload' },
+            bilibili: { name: 'B站', color: '#00a1d6', url: 'https://member.bilibili.com/platform/upload/text' },
+            weibo: { name: '微博', color: '#e6162d', url: 'https://weibo.com' }
+        };
+        
+        // State
+        let currentFilter = 'all';
+        let publishedItems = JSON.parse(localStorage.getItem('published_items') || '{}');
+        
+        // Init
+        function init() {
+            renderContent();
+            updateStats();
+            bindFilters();
+        }
+        
+        // Get content data
+        function getContent() {
+            if (typeof window.contentData !== 'undefined' && Array.isArray(window.contentData)) {
+                return window.contentData;
+            }
+            return [];
+        }
+        
+        // Render content list
+        function renderContent() {
+            const list = document.getElementById('contentList');
+            let items = getContent();
+            
+            // Apply filter
+            if (currentFilter === 'pending') {
+                items = items.filter(item => !publishedItems[item.id]);
+            } else if (currentFilter === 'done') {
+                items = items.filter(item => publishedItems[item.id]);
+            } else if (currentFilter !== 'all') {
+                items = items.filter(item => item.platform === currentFilter);
+            }
+            
+            if (items.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📭</div>
+                        <h3>暂无内容</h3>
+                        <p>等待推广工作流生成新内容...</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort by date desc
+            items.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+            
+            list.innerHTML = items.map(item => {
+                const platform = PLATFORMS[item.platform] || { name: item.platform, color: '#666' };
+                const isDone = publishedItems[item.id];
+                const preview = (item.content || '').substring(0, 150) + '...';
+                
+                return `
+                    <div class="content-card" data-id="${item.id}">
+                        <div class="card-header">
+                            <div class="card-meta">
+                                <span class="platform-badge" style="background:${platform.color}">${platform.name}</span>
+                                <span class="project-name">${item.project || ''}</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:0.5rem;">
+                                <span class="card-date">${item.date || ''}</span>
+                                <span class="status-badge ${isDone ? 'status-done' : 'status-pending'}">${isDone ? '已发布' : '待发布'}</span>
+                            </div>
+                        </div>
+                        <div class="card-title">${item.title || ''}</div>
+                        <div class="card-preview" id="preview-${item.id}">${escapeHtml(preview)}</div>
+                        <button class="expand-btn" onclick="toggleExpand('${item.id}')">展开全文 ↓</button>
+                        <div class="card-actions">
+                            <button class="action-btn btn-copy" onclick="copyContent('${item.id}')">📋 一键复制</button>
+                            <div class="publish-dropdown">
+                                <button class="action-btn btn-publish" onclick="toggleDropdown(event, '${item.id}')">🚀 去发布 ▾</button>
+                                <div class="dropdown-menu" id="dropdown-${item.id}">
+                                    ${Object.entries(PLATFORMS).map(([key, p]) => `
+                                        <a class="dropdown-item" href="${p.url}" target="_blank" onclick="event.stopPropagation()">
+                                            <span class="dot ${key}"></span>
+                                            ${p.name}
+                                        </a>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <button class="action-btn btn-view" onclick="viewFull('${item.id}')" style="background:white;border:1px solid var(--border);">👁 查看</button>
+                            <button class="action-btn btn-done ${isDone ? 'is-done' : ''}" onclick="markDone('${item.id}')">${isDone ? '✅ 已发布' : '☐ 标记完成'}</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Update stats
+        function updateStats() {
+            const items = getContent();
+            const done = items.filter(i => publishedItems[i.id]).length;
+            document.getElementById('totalContent').textContent = items.length;
+            document.getElementById('pendingContent').textContent = items.length - done;
+            document.getElementById('doneContent').textContent = done;
+        }
+        
+        // Toggle expand
+        function toggleExpand(id) {
+            const el = document.getElementById(`preview-${id}`);
+            const btn = el.nextElementSibling;
+            if (el.classList.contains('expanded')) {
+                el.classList.remove('expanded');
+                const item = getContent().find(i => i.id === id);
+                el.textContent = (item.content || '').substring(0, 150) + '...';
+                btn.textContent = '展开全文 ↓';
+            } else {
+                el.classList.add('expanded');
+                const item = getContent().find(i => i.id === id);
+                el.textContent = item.content || '';
+                btn.textContent = '收起 ↑';
+            }
+        }
+        
+        // Copy content
+        function copyContent(id) {
+            const item = getContent().find(i => i.id === id);
+            if (!item) return;
+            
+            navigator.clipboard.writeText(item.content || '').then(() => {
+                const btn = document.querySelector(`[data-id="${id}"] .btn-copy`);
+                btn.textContent = '✅ 已复制';
+                btn.classList.add('copied');
+                showToast('内容已复制到剪贴板');
+                setTimeout(() => {
+                    btn.textContent = '📋 一键复制';
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = item.content || '';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('内容已复制到剪贴板');
+            });
+        }
+        
+        // View full content
+        function viewFull(id) {
+            const item = getContent().find(i => i.id === id);
+            if (!item) return;
+            document.getElementById('modalTitle').textContent = item.title || '内容详情';
+            document.getElementById('modalContent').textContent = item.content || '';
+            document.getElementById('modal').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+        
+        // Mark as done
+        function markDone(id) {
+            if (publishedItems[id]) {
+                delete publishedItems[id];
+            } else {
+                publishedItems[id] = { doneAt: new Date().toISOString() };
+            }
+            localStorage.setItem('published_items', JSON.stringify(publishedItems));
+            renderContent();
+            updateStats();
+        }
+        
+        // Dropdown
+        function toggleDropdown(event, id) {
+            event.stopPropagation();
+            const menu = document.getElementById(`dropdown-${id}`);
+            // Close all other dropdowns
+            document.querySelectorAll('.dropdown-menu').forEach(m => {
+                if (m !== menu) m.classList.remove('show');
+            });
+            menu.classList.toggle('show');
+        }
+        
+        // Filters
+        function bindFilters() {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilter = btn.dataset.filter;
+                    renderContent();
+                });
+            });
+        }
+        
+        // Close dropdown on outside click
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+        });
+        
+        // Close modal on overlay click
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modal')) closeModal();
+        });
+        
+        // Toast
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+        
+        // Escape HTML
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+        
+        init();
+    </script>
+</body>
+</html>
