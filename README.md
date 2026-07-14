@@ -27,4 +27,4 @@
 纯静态HTML + CSS + JavaScript，无需构建步骤
 
 ## 域名
-publish.hpenn.xyz
+publish.hpennn.xyz
