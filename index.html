@@ -3,672 +3,569 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>内容发布助手 - 一键复制推广内容</title>
-    <meta name="description" content="推广内容一键复制发布助手，支持小红书、知乎、微信公众号、抖音等多平台">
+    <title>内容发布助手</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --text: #1e293b;
-            --text-secondary: #64748b;
-            --border: #e2e8f0;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --xhs: #fe2c55;
-            --zhihu: #0066ff;
-            --wechat: #07c160;
-            --douyin: #111;
-            --bilibili: #00a1d6;
-            --weibo: #e6162d;
-        }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            background: #f5f5f5;
+            color: #333;
             min-height: 100vh;
         }
-        
+        .container { max-width: 960px; margin: 0 auto; padding: 20px; }
+
         /* Header */
         .header {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            color: white;
-            padding: 2rem 1rem;
-            text-align: center;
-        }
-        .header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
-        .header p { opacity: 0.9; font-size: 0.95rem; }
-        
-        /* Stats Bar */
-        .stats-bar {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            padding: 1rem;
-            background: white;
-            border-bottom: 1px solid var(--border);
-            flex-wrap: wrap;
-        }
-        .stat-item {
-            text-align: center;
-        }
-        .stat-num {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        .stat-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-        
-        /* Quick Links */
-        .quick-links {
-            display: flex;
-            gap: 0.5rem;
-            padding: 1rem;
-            overflow-x: auto;
-            background: white;
-            border-bottom: 1px solid var(--border);
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .quick-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.5rem 1rem;
-            border-radius: 2rem;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: white;
-            text-decoration: none;
-            white-space: nowrap;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .quick-link:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        .quick-link.xhs { background: var(--xhs); }
-        .quick-link.zhihu { background: var(--zhihu); }
-        .quick-link.wechat { background: var(--wechat); }
-        .quick-link.douyin { background: var(--douyin); }
-        .quick-link.bilibili { background: var(--bilibili); }
-        .quick-link.weibo { background: var(--weibo); }
-        
-        /* Filters */
-        .filters {
-            display: flex;
-            gap: 0.5rem;
-            padding: 1rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .filter-btn {
-            padding: 0.4rem 1rem;
-            border: 1px solid var(--border);
-            border-radius: 1.5rem;
-            background: white;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
-        .filter-btn:hover { border-color: var(--primary); color: var(--primary); }
-        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-        
-        /* Content List */
-        .content-list {
-            max-width: 800px;
-            margin: 1.5rem auto;
-            padding: 0 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        
-        /* Content Card */
-        .content-card {
-            background: var(--card);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-            transition: box-shadow 0.2s;
-        }
-        .content-card:hover {
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1rem 1.2rem;
-            border-bottom: 1px solid var(--border);
-        }
-        .card-meta {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            flex-wrap: wrap;
-        }
-        .platform-badge {
-            padding: 0.2rem 0.6rem;
-            border-radius: 1rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: white;
-        }
-        .project-name {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-        .card-date {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-        .status-badge {
-            padding: 0.2rem 0.6rem;
-            border-radius: 1rem;
-            font-size: 0.7rem;
-            font-weight: 500;
-        }
-        .status-pending { background: #fef3c7; color: #92400e; }
-        .status-done { background: #d1fae5; color: #065f46; }
-        
-        .card-title {
-            padding: 1rem 1.2rem 0.5rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            line-height: 1.5;
-        }
-        .card-preview {
-            padding: 0 1.2rem 1rem;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            max-height: 100px;
-            overflow: hidden;
-            position: relative;
-        }
-        .card-preview.expanded {
-            max-height: none;
-        }
-        .expand-btn {
-            padding: 0.3rem 1.2rem 0.8rem;
-            background: none;
-            border: none;
-            color: var(--primary);
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-        
-        /* Full Content Modal */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal {
-            background: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 28px 20px;
             border-radius: 16px;
-            width: 100%;
-            max-width: 700px;
-            max-height: 85vh;
-            overflow-y: auto;
-            position: relative;
-        }
-        .modal-header {
-            padding: 1.2rem 1.5rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 10;
-            border-radius: 16px 16px 0 0;
-        }
-        .modal-close {
-            width: 32px;
-            height: 32px;
-            border: none;
-            background: var(--bg);
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-body {
-            padding: 1.5rem;
-        }
-        .modal-body pre {
-            white-space: pre-wrap;
-            word-break: break-word;
-            font-family: inherit;
-            font-size: 0.9rem;
-            line-height: 1.8;
-            color: var(--text);
-        }
-        
-        /* Action Buttons */
-        .card-actions {
-            display: flex;
-            gap: 0.5rem;
-            padding: 0.8rem 1.2rem;
-            border-top: 1px solid var(--border);
-            background: #fafbfc;
-            flex-wrap: wrap;
-        }
-        .action-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-        }
-        .btn-copy {
-            background: var(--primary);
-            color: white;
-        }
-        .btn-copy:hover { background: var(--primary-hover); }
-        .btn-copy.copied {
-            background: var(--success);
-        }
-        .btn-publish {
-            background: white;
-            border: 1px solid var(--border);
-            color: var(--text);
-        }
-        .btn-publish:hover { border-color: var(--primary); color: var(--primary); }
-        .btn-done {
-            background: white;
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-        }
-        .btn-done:hover { border-color: var(--success); color: var(--success); }
-        .btn-done.is-done {
-            background: var(--success);
-            color: white;
-            border-color: var(--success);
-        }
-        
-        /* Publish Dropdown */
-        .publish-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            bottom: 100%;
-            left: 0;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            min-width: 160px;
-            z-index: 50;
-            margin-bottom: 4px;
-        }
-        .dropdown-menu.show { display: block; }
-        .dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.6rem 1rem;
-            font-size: 0.85rem;
-            color: var(--text);
-            text-decoration: none;
-            transition: background 0.2s;
-        }
-        .dropdown-item:hover { background: var(--bg); }
-        .dropdown-item:first-child { border-radius: 8px 8px 0 0; }
-        .dropdown-item:last-child { border-radius: 0 0 8px 8px; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; }
-        .dot.xhs { background: var(--xhs); }
-        .dot.zhihu { background: var(--zhihu); }
-        .dot.wechat { background: var(--wechat); }
-        .dot.douyin { background: var(--douyin); }
-        .dot.bilibili { background: var(--bilibili); }
-        .dot.weibo { background: var(--weibo); }
-        
-        /* Empty State */
-        .empty-state {
+            margin-bottom: 20px;
             text-align: center;
-            padding: 4rem 1rem;
-            color: var(--text-secondary);
         }
-        .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
-        .empty-state h3 { margin-bottom: 0.5rem; color: var(--text); }
-        
+        .header h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+        .header p { font-size: 14px; opacity: 0.85; }
+        .header .stats {
+            display: flex; gap: 20px; justify-content: center; margin-top: 14px;
+            font-size: 13px; opacity: 0.9;
+        }
+        .header .stats span { background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 20px; }
+
+        /* Tabs */
+        .tabs {
+            display: flex; gap: 6px; margin-bottom: 20px;
+            background: #fff; padding: 6px; border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        .tab {
+            flex: 1; padding: 12px; text-align: center; border-radius: 8px;
+            cursor: pointer; font-size: 14px; font-weight: 500;
+            transition: all 0.2s; border: none; background: none;
+            color: #666;
+        }
+        .tab:hover { background: #f0f0f0; }
+        .tab.active { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
+        .tab .count {
+            display: inline-block; background: rgba(0,0,0,0.1);
+            padding: 1px 7px; border-radius: 10px; font-size: 11px; margin-left: 4px;
+        }
+        .tab.active .count { background: rgba(255,255,255,0.25); }
+
+        /* Tab content */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Campaign section */
+        .campaign-section { margin-bottom: 28px; }
+        .campaign-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 14px; padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        .campaign-header .icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 700; font-size: 16px;
+        }
+        .campaign-header .info { flex: 1; }
+        .campaign-header .info h3 { font-size: 16px; color: #333; }
+        .campaign-header .info .meta { font-size: 12px; color: #999; margin-top: 2px; }
+        .campaign-header .info .meta a { color: #667eea; text-decoration: none; }
+        .campaign-header .info .meta a:hover { text-decoration: underline; }
+
+        /* Card */
+        .card {
+            background: #fff; border-radius: 12px; padding: 18px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            margin-bottom: 14px; transition: box-shadow 0.2s;
+        }
+        .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .card-head {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .card-head .platform-tag {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 12px; font-weight: 500;
+        }
+        .card-head .card-title { font-size: 13px; color: #999; }
+
+        /* Text content */
+        .text-content {
+            font-size: 14px; line-height: 1.8; color: #444;
+            white-space: pre-wrap; word-break: break-word;
+            background: #fafafa; border-radius: 8px; padding: 14px;
+            max-height: 200px; overflow-y: auto;
+            border: 1px solid #f0f0f0;
+        }
+
+        /* Image content */
+        .image-card .img-area {
+            width: 100%; aspect-ratio: 16/9; border-radius: 8px;
+            overflow: hidden; background: #f0f0f0;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 12px; position: relative;
+        }
+        .image-card .img-area img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .image-card .img-placeholder {
+            text-align: center; color: #bbb;
+        }
+        .image-card .img-placeholder .icon { font-size: 40px; margin-bottom: 8px; }
+        .image-card .img-placeholder p { font-size: 13px; }
+        .image-card .prompt-box {
+            background: #fafafa; border: 1px solid #f0f0f0;
+            border-radius: 8px; padding: 12px; font-size: 13px;
+            line-height: 1.6; color: #666;
+        }
+        .image-card .prompt-box .label {
+            font-size: 11px; color: #999; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        /* Video content */
+        .video-card .script-box {
+            background: #fafafa; border: 1px solid #f0f0f0;
+            border-radius: 8px; padding: 14px; font-size: 13px;
+            line-height: 1.8; color: #444;
+            white-space: pre-wrap; word-break: break-word;
+            max-height: 300px; overflow-y: auto;
+        }
+        .video-card .script-box .scene {
+            color: #667eea; font-weight: 600;
+        }
+        .video-card .platform-hint {
+            display: flex; align-items: center; gap: 6px;
+            margin-top: 10px; font-size: 12px; color: #999;
+        }
+
+        /* Actions */
+        .actions {
+            display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;
+        }
+        .btn {
+            padding: 8px 16px; border-radius: 8px; border: none;
+            font-size: 13px; font-weight: 500; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 5px;
+            transition: all 0.15s;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: #667eea; color: #fff; }
+        .btn-primary:hover { background: #5a6fd6; }
+        .btn-secondary { background: #f0f0f0; color: #333; }
+        .btn-secondary:hover { background: #e4e4e4; }
+        .btn-platform { color: #fff; }
+        .btn-platform:hover { opacity: 0.9; }
+        .btn-jimeng { background: linear-gradient(135deg, #FF6B6B, #ee5a24); color: #fff; }
+        .btn-jimeng:hover { opacity: 0.9; }
+        .btn-publish { background: #07C160; color: #fff; }
+        .btn-publish:hover { background: #06ad56; }
+        .btn-img-gen { background: linear-gradient(135deg, #a855f7, #6366f1); color: #fff; }
+        .btn-img-gen:hover { opacity: 0.9; }
+
+        /* Status */
+        .status-badge {
+            display: inline-block; padding: 3px 10px; border-radius: 20px;
+            font-size: 11px; font-weight: 500;
+        }
+        .status-pending { background: #FFF3CD; color: #856404; }
+        .status-done { background: #D4EDDA; color: #155724; }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center; padding: 50px 20px; color: #aaa;
+        }
+        .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-state p { font-size: 14px; }
+
+        /* Workflow guide */
+        .workflow-guide {
+            background: linear-gradient(135deg, #f093fb22, #f5576c22);
+            border: 1px solid #f093fb44;
+            border-radius: 12px; padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+        .workflow-guide h4 { font-size: 14px; color: #333; margin-bottom: 8px; }
+        .workflow-guide .steps {
+            display: flex; gap: 12px; flex-wrap: wrap;
+        }
+        .workflow-guide .step {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 12px; color: #666;
+        }
+        .workflow-guide .step .num {
+            width: 22px; height: 22px; border-radius: 50%;
+            background: #667eea; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 600;
+        }
+        .workflow-guide .arrow { color: #ccc; font-size: 16px; }
+
         /* Toast */
         .toast {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #1e293b;
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            z-index: 200;
-            transition: transform 0.3s ease;
-            white-space: nowrap;
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+            background: #333; color: #fff; padding: 10px 24px; border-radius: 10px;
+            font-size: 14px; opacity: 0; transition: all 0.3s; z-index: 999;
+            pointer-events: none;
         }
-        .toast.show { transform: translateX(-50%) translateY(0); }
-        
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        /* Filter */
+        .filter-bar {
+            display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;
+        }
+        .filter-bar label { font-size: 13px; color: #666; }
+        .filter-bar select {
+            padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px;
+            font-size: 13px; background: #fff;
+        }
+
         /* Responsive */
         @media (max-width: 640px) {
-            .header h1 { font-size: 1.4rem; }
-            .stats-bar { gap: 1rem; }
-            .card-actions { flex-direction: column; }
-            .action-btn { justify-content: center; }
+            .container { padding: 12px; }
+            .header h1 { font-size: 20px; }
+            .header .stats { flex-direction: column; gap: 6px; align-items: center; }
+            .tabs { flex-wrap: nowrap; overflow-x: auto; }
+            .tab { min-width: 0; padding: 10px 8px; font-size: 13px; }
+            .actions { flex-direction: column; }
+            .btn { justify-content: center; }
+            .workflow-guide .steps { flex-direction: column; gap: 8px; }
+            .workflow-guide .arrow { display: none; }
+            .filter-bar { flex-direction: column; }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>📢 内容发布助手</h1>
-        <p>一键复制推广内容，快速发布到各平台</p>
-    </div>
-    
-    <div class="stats-bar">
-        <div class="stat-item">
-            <div class="stat-num" id="totalContent">0</div>
-            <div class="stat-label">总内容</div>
+    <div class="container">
+        <div class="header">
+            <h1>📢 内容发布助手</h1>
+            <p>每日推广内容一站式管理 · 复制→发布→记录</p>
+            <div class="stats" id="stats"></div>
         </div>
-        <div class="stat-item">
-            <div class="stat-num" id="pendingContent">0</div>
-            <div class="stat-label">待发布</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-num" id="doneContent">0</div>
-            <div class="stat-label">已发布</div>
-        </div>
-    </div>
-    
-    <div class="quick-links">
-        <a class="quick-link xhs" href="https://creator.xiaohongshu.com/publish/publish" target="_blank">📕 小红书</a>
-        <a class="quick-link zhihu" href="https://www.zhihu.com/creator" target="_blank">📘 知乎</a>
-        <a class="quick-link wechat" href="https://mp.weixin.qq.com/" target="_blank">💚 微信公众号</a>
-        <a class="quick-link douyin" href="https://creator.douyin.com/creator-micro/content/upload" target="_blank">🎵 抖音</a>
-        <a class="quick-link bilibili" href="https://member.bilibili.com/platform/upload/text" target="_blank">📺 B站</a>
-        <a class="quick-link weibo" href="https://weibo.com" target="_blank">🔴 微博</a>
-    </div>
-    
-    <div class="filters">
-        <button class="filter-btn active" data-filter="all">全部</button>
-        <button class="filter-btn" data-filter="xhs">小红书</button>
-        <button class="filter-btn" data-filter="zhihu">知乎</button>
-        <button class="filter-btn" data-filter="douyin">短视频</button>
-        <button class="filter-btn" data-filter="wechat">公众号</button>
-        <button class="filter-btn" data-filter="pending">待发布</button>
-        <button class="filter-btn" data-filter="done">已发布</button>
-    </div>
-    
-    <div class="content-list" id="contentList"></div>
-    
-    <!-- Modal -->
-    <div class="modal-overlay" id="modal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 id="modalTitle">内容详情</h3>
-                <button class="modal-close" onclick="closeModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <pre id="modalContent"></pre>
+
+        <div class="workflow-guide">
+            <h4>📋 发布流程</h4>
+            <div class="steps">
+                <div class="step"><span class="num">1</span> 选择内容，点击复制</div>
+                <span class="arrow">→</span>
+                <div class="step"><span class="num">2</span> 打开平台发布页</div>
+                <span class="arrow">→</span>
+                <div class="step"><span class="num">3</span> 粘贴内容，上传配图</div>
+                <span class="arrow">→</span>
+                <div class="step"><span class="num">4</span> 点击「已发布」记录</div>
             </div>
         </div>
+
+        <div class="filter-bar">
+            <label>筛选项目：</label>
+            <select id="projectFilter" onchange="renderAll()">
+                <option value="all">全部项目</option>
+            </select>
+            <label style="margin-left:8px;">日期：</label>
+            <select id="dateFilter" onchange="renderAll()">
+                <option value="all">全部日期</option>
+            </select>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('text')">📝 文案内容 <span class="count" id="textCount">0</span></button>
+            <button class="tab" onclick="switchTab('image')">🖼️ 图文配图 <span class="count" id="imageCount">0</span></button>
+            <button class="tab" onclick="switchTab('video')">🎬 视频脚本 <span class="count" id="videoCount">0</span></button>
+        </div>
+
+        <div id="textContent" class="tab-content active"></div>
+        <div id="imageContent" class="tab-content"></div>
+        <div id="videoContent" class="tab-content"></div>
     </div>
-    
-    <!-- Toast -->
+
     <div class="toast" id="toast"></div>
-    
+
     <script src="data.js"></script>
     <script>
-        // Platform config
-        const PLATFORMS = {
-            xhs: { name: '小红书', color: '#fe2c55', url: 'https://creator.xiaohongshu.com/publish/publish' },
-            zhihu: { name: '知乎', color: '#0066ff', url: 'https://www.zhihu.com/creator' },
-            wechat: { name: '微信公众号', color: '#07c160', url: 'https://mp.weixin.qq.com/' },
-            douyin: { name: '抖音', color: '#111', url: 'https://creator.douyin.com/creator-micro/content/upload' },
-            bilibili: { name: 'B站', color: '#00a1d6', url: 'https://member.bilibili.com/platform/upload/text' },
-            weibo: { name: '微博', color: '#e6162d', url: 'https://weibo.com' }
-        };
-        
-        // State
-        let currentFilter = 'all';
-        let publishedItems = JSON.parse(localStorage.getItem('published_items') || '{}');
-        
-        // Init
-        function init() {
-            renderContent();
-            updateStats();
-            bindFilters();
+        let currentTab = 'text';
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            document.getElementById(tab + 'Content').classList.add('active');
         }
-        
-        // Get content data
-        function getContent() {
-            if (typeof window.contentData !== 'undefined' && Array.isArray(window.contentData)) {
-                return window.contentData;
-            }
-            return [];
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
         }
-        
-        // Render content list
-        function renderContent() {
-            const list = document.getElementById('contentList');
-            let items = getContent();
-            
-            // Apply filter
-            if (currentFilter === 'pending') {
-                items = items.filter(item => !publishedItems[item.id]);
-            } else if (currentFilter === 'done') {
-                items = items.filter(item => publishedItems[item.id]);
-            } else if (currentFilter !== 'all') {
-                items = items.filter(item => item.platform === currentFilter);
-            }
-            
-            if (items.length === 0) {
-                list.innerHTML = `
-                    <div class="empty-state">
-                        <div class="icon">📭</div>
-                        <h3>暂无内容</h3>
-                        <p>等待推广工作流生成新内容...</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Sort by date desc
-            items.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-            
-            list.innerHTML = items.map(item => {
-                const platform = PLATFORMS[item.platform] || { name: item.platform, color: '#666' };
-                const isDone = publishedItems[item.id];
-                const preview = (item.content || '').substring(0, 150) + '...';
-                
-                return `
-                    <div class="content-card" data-id="${item.id}">
-                        <div class="card-header">
-                            <div class="card-meta">
-                                <span class="platform-badge" style="background:${platform.color}">${platform.name}</span>
-                                <span class="project-name">${item.project || ''}</span>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:0.5rem;">
-                                <span class="card-date">${item.date || ''}</span>
-                                <span class="status-badge ${isDone ? 'status-done' : 'status-pending'}">${isDone ? '已发布' : '待发布'}</span>
-                            </div>
-                        </div>
-                        <div class="card-title">${item.title || ''}</div>
-                        <div class="card-preview" id="preview-${item.id}">${escapeHtml(preview)}</div>
-                        <button class="expand-btn" onclick="toggleExpand('${item.id}')">展开全文 ↓</button>
-                        <div class="card-actions">
-                            <button class="action-btn btn-copy" onclick="copyContent('${item.id}')">📋 一键复制</button>
-                            <div class="publish-dropdown">
-                                <button class="action-btn btn-publish" onclick="toggleDropdown(event, '${item.id}')">🚀 去发布 ▾</button>
-                                <div class="dropdown-menu" id="dropdown-${item.id}">
-                                    ${Object.entries(PLATFORMS).map(([key, p]) => `
-                                        <a class="dropdown-item" href="${p.url}" target="_blank" onclick="event.stopPropagation()">
-                                            <span class="dot ${key}"></span>
-                                            ${p.name}
-                                        </a>
-                                    `).join('')}
-                                </div>
-                            </div>
-                            <button class="action-btn btn-view" onclick="viewFull('${item.id}')" style="background:white;border:1px solid var(--border);">👁 查看</button>
-                            <button class="action-btn btn-done ${isDone ? 'is-done' : ''}" onclick="markDone('${item.id}')">${isDone ? '✅ 已发布' : '☐ 标记完成'}</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        // Update stats
-        function updateStats() {
-            const items = getContent();
-            const done = items.filter(i => publishedItems[i.id]).length;
-            document.getElementById('totalContent').textContent = items.length;
-            document.getElementById('pendingContent').textContent = items.length - done;
-            document.getElementById('doneContent').textContent = done;
-        }
-        
-        // Toggle expand
-        function toggleExpand(id) {
-            const el = document.getElementById(`preview-${id}`);
-            const btn = el.nextElementSibling;
-            if (el.classList.contains('expanded')) {
-                el.classList.remove('expanded');
-                const item = getContent().find(i => i.id === id);
-                el.textContent = (item.content || '').substring(0, 150) + '...';
-                btn.textContent = '展开全文 ↓';
-            } else {
-                el.classList.add('expanded');
-                const item = getContent().find(i => i.id === id);
-                el.textContent = item.content || '';
-                btn.textContent = '收起 ↑';
-            }
-        }
-        
-        // Copy content
-        function copyContent(id) {
-            const item = getContent().find(i => i.id === id);
-            if (!item) return;
-            
-            navigator.clipboard.writeText(item.content || '').then(() => {
-                const btn = document.querySelector(`[data-id="${id}"] .btn-copy`);
-                btn.textContent = '✅ 已复制';
-                btn.classList.add('copied');
-                showToast('内容已复制到剪贴板');
-                setTimeout(() => {
-                    btn.textContent = '📋 一键复制';
-                    btn.classList.remove('copied');
-                }, 2000);
+
+        function copyText(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('✅ 已复制到剪贴板');
+                if (btn) {
+                    btn.textContent = '✅ 已复制';
+                    setTimeout(() => { btn.textContent = '📋 复制内容'; }, 2000);
+                }
             }).catch(() => {
                 // Fallback
-                const textarea = document.createElement('textarea');
-                textarea.value = item.content || '';
-                document.body.appendChild(textarea);
-                textarea.select();
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
                 document.execCommand('copy');
-                document.body.removeChild(textarea);
-                showToast('内容已复制到剪贴板');
+                document.body.removeChild(ta);
+                showToast('✅ 已复制到剪贴板');
             });
         }
-        
-        // View full content
-        function viewFull(id) {
-            const item = getContent().find(i => i.id === id);
-            if (!item) return;
-            document.getElementById('modalTitle').textContent = item.title || '内容详情';
-            document.getElementById('modalContent').textContent = item.content || '';
-            document.getElementById('modal').classList.add('active');
+
+        function copyScript(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('✅ 脚本已复制，去即梦粘贴生成');
+                if (btn) {
+                    const orig = btn.innerHTML;
+                    btn.innerHTML = '✅ 已复制';
+                    setTimeout(() => { btn.innerHTML = orig; }, 2000);
+                }
+            }).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast('✅ 脚本已复制，去即梦粘贴生成');
+            });
         }
-        
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
+
+        function openPlatform(platform) {
+            const p = PLATFORMS[platform];
+            if (p) window.open(p.url, '_blank');
         }
-        
-        // Mark as done
-        function markDone(id) {
-            if (publishedItems[id]) {
-                delete publishedItems[id];
-            } else {
-                publishedItems[id] = { doneAt: new Date().toISOString() };
+
+        function openJimeng() {
+            window.open('https://jimeng.jianying.com/', '_blank');
+        }
+
+        function markPublished(el) {
+            const badge = el.querySelector('.status-badge');
+            if (badge) {
+                badge.className = 'status-badge status-done';
+                badge.textContent = '✅ 已发布';
             }
-            localStorage.setItem('published_items', JSON.stringify(publishedItems));
-            renderContent();
-            updateStats();
+            el.style.opacity = '0.6';
+            showToast('🎉 已标记为发布完成');
         }
-        
-        // Dropdown
-        function toggleDropdown(event, id) {
-            event.stopPropagation();
-            const menu = document.getElementById(`dropdown-${id}`);
-            // Close all other dropdowns
-            document.querySelectorAll('.dropdown-menu').forEach(m => {
-                if (m !== menu) m.classList.remove('show');
+
+        function openPublishPage(platform) {
+            const p = PLATFORMS[platform];
+            if (p) window.open(p.url, '_blank');
+        }
+
+        function getFilteredCampaigns() {
+            const pf = document.getElementById('projectFilter').value;
+            const df = document.getElementById('dateFilter').value;
+            return CAMPAIGNS.filter(c => {
+                if (pf !== 'all' && c.project !== pf) return false;
+                if (df !== 'all' && c.date !== df) return false;
+                return true;
             });
-            menu.classList.toggle('show');
         }
-        
-        // Filters
-        function bindFilters() {
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentFilter = btn.dataset.filter;
-                    renderContent();
+
+        function getCampaignHeader(c) {
+            return `
+                <div class="campaign-header">
+                    <div class="icon">${c.project.charAt(0)}</div>
+                    <div class="info">
+                        <h3>${c.project}</h3>
+                        <div class="meta">${c.date} · <a href="${c.url}" target="_blank">${c.url}</a></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getPlatformTag(platform, platformName) {
+            const p = PLATFORMS[platform] || {};
+            const color = p.color || '#666';
+            return `<span class="platform-tag" style="background:${color}15;color:${color}">${p.icon || '📄'} ${platformName || platform}</span>`;
+        }
+
+        function renderText() {
+            const campaigns = getFilteredCampaigns();
+            const container = document.getElementById('textContent');
+            let html = '';
+            let total = 0;
+
+            campaigns.forEach(c => {
+                if (!c.texts || c.texts.length === 0) return;
+                html += `<div class="campaign-section">${getCampaignHeader(c)}`;
+                c.texts.forEach(t => {
+                    total++;
+                    const p = PLATFORMS[t.platform] || {};
+                    html += `
+                        <div class="card" id="text-${t.id}">
+                            <div class="card-head">
+                                ${getPlatformTag(t.platform, t.platformName)}
+                                <span class="status-badge status-pending">待发布</span>
+                            </div>
+                            <div style="font-weight:600;font-size:14px;margin-bottom:8px;color:#333;">${t.title}</div>
+                            <div class="text-content">${t.content}</div>
+                            <div class="actions">
+                                <button class="btn btn-primary" onclick="copyText(\`${t.content.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, this)">📋 复制内容</button>
+                                <button class="btn btn-platform" style="background:${p.color || '#667eea'}" onclick="openPlatform('${t.platform}')">${p.icon || '🔗'} 打开${t.platformName}</button>
+                                <button class="btn btn-publish" onclick="markPublished(this.closest('.card'))">✅ 已发布</button>
+                            </div>
+                        </div>
+                    `;
                 });
+                html += '</div>';
             });
+
+            if (total === 0) {
+                html = '<div class="empty-state"><div class="icon">📝</div><p>暂无文案内容，每日8:30自动生成</p></div>';
+            }
+            container.innerHTML = html;
+            document.getElementById('textCount').textContent = total;
         }
-        
-        // Close dropdown on outside click
-        document.addEventListener('click', () => {
-            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
-        });
-        
-        // Close modal on overlay click
-        document.getElementById('modal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('modal')) closeModal();
-        });
-        
-        // Toast
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2500);
+
+        function renderImages() {
+            const campaigns = getFilteredCampaigns();
+            const container = document.getElementById('imageContent');
+            let html = '';
+            let total = 0;
+
+            campaigns.forEach(c => {
+                if (!c.images || c.images.length === 0) return;
+                html += `<div class="campaign-section">${getCampaignHeader(c)}`;
+                c.images.forEach(img => {
+                    total++;
+                    const hasImage = img.image && img.image !== 'null';
+                    html += `
+                        <div class="card image-card" id="img-${img.id}">
+                            <div class="card-head">
+                                <span style="font-size:14px;font-weight:600;color:#333;">🖼️ ${img.title}</span>
+                                <span style="font-size:12px;color:#999;">16:9</span>
+                            </div>
+                            <div class="img-area">
+                                ${hasImage
+                                    ? `<img src="${img.image}" alt="${img.title}">`
+                                    : `<div class="img-placeholder">
+                                        <div class="icon">🎨</div>
+                                        <p>点击下方按钮生成配图</p>
+                                       </div>`
+                                }
+                            </div>
+                            <div class="prompt-box">
+                                <div class="label">绘图提示词 (Prompt)</div>
+                                ${img.prompt}
+                            </div>
+                            <div class="actions">
+                                <button class="btn btn-img-gen" onclick="copyText(\`${img.prompt.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, this)">📋 复制提示词去生成</button>
+                                ${hasImage ? `<button class="btn btn-primary" onclick="copyText('image', this)">📋 复制图片</button>` : ''}
+                                <button class="btn btn-secondary" onclick="openJimeng()">🎨 打开即梦</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            });
+
+            if (total === 0) {
+                html = '<div class="empty-state"><div class="icon">🖼️</div><p>暂无配图内容</p></div>';
+            }
+            container.innerHTML = html;
+            document.getElementById('imageCount').textContent = total;
         }
-        
-        // Escape HTML
-        function escapeHtml(str) {
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
+
+        function renderVideos() {
+            const campaigns = getFilteredCampaigns();
+            const container = document.getElementById('videoContent');
+            let html = '';
+            let total = 0;
+
+            campaigns.forEach(c => {
+                if (!c.videos || c.videos.length === 0) return;
+                html += `<div class="campaign-section">${getCampaignHeader(c)}`;
+                c.videos.forEach(v => {
+                    total++;
+                    // Format script with scene highlights
+                    let formattedScript = v.script
+                        .replace(/【(.*?)】/g, '<span class="scene">【$1】</span>');
+
+                    html += `
+                        <div class="card video-card" id="video-${v.id}">
+                            <div class="card-head">
+                                <span style="font-size:14px;font-weight:600;color:#333;">🎬 ${v.title}</span>
+                                <span class="platform-tag" style="background:#FF6B6B15;color:#FF6B6B">🎬 ${v.platform}</span>
+                            </div>
+                            <div class="script-box">${formattedScript}</div>
+                            <div class="platform-hint">💡 复制脚本后粘贴到即梦，生成AI视频</div>
+                            <div class="actions">
+                                <button class="btn btn-jimeng" onclick="copyScript(\`${v.script.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, this)">📋 复制脚本</button>
+                                <button class="btn btn-jimeng" onclick="openJimeng()">🎬 打开即梦生成视频</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            });
+
+            if (total === 0) {
+                html = '<div class="empty-state"><div class="icon">🎬</div><p>暂无视频脚本</p></div>';
+            }
+            container.innerHTML = html;
+            document.getElementById('videoCount').textContent = total;
         }
-        
-        init();
+
+        function renderAll() {
+            renderText();
+            renderImages();
+            renderVideos();
+            updateStats();
+            updateFilters();
+        }
+
+        function updateStats() {
+            let totalText = 0, totalImg = 0, totalVideo = 0;
+            CAMPAIGNS.forEach(c => {
+                totalText += (c.texts || []).length;
+                totalImg += (c.images || []).length;
+                totalVideo += (c.videos || []).length;
+            });
+            document.getElementById('stats').innerHTML = `
+                <span>📝 ${totalText} 条文案</span>
+                <span>🖼️ ${totalImg} 张配图</span>
+                <span>🎬 ${totalVideo} 个脚本</span>
+            `;
+        }
+
+        function updateFilters() {
+            const projectSelect = document.getElementById('projectFilter');
+            const dateSelect = document.getElementById('dateFilter');
+            const currentProject = projectSelect.value;
+            const currentDate = dateSelect.value;
+
+            const projects = [...new Set(CAMPAIGNS.map(c => c.project))];
+            const dates = [...new Set(CAMPAIGNS.map(c => c.date))].sort().reverse();
+
+            let projOpts = '<option value="all">全部项目</option>';
+            projects.forEach(p => {
+                projOpts += `<option value="${p}" ${p === currentProject ? 'selected' : ''}>${p}</option>`;
+            });
+            projectSelect.innerHTML = projOpts;
+
+            let dateOpts = '<option value="all">全部日期</option>';
+            dates.forEach(d => {
+                dateOpts += `<option value="${d}" ${d === currentDate ? 'selected' : ''}>${d}</option>`;
+            });
+            dateSelect.innerHTML = dateOpts;
+        }
+
+        // Init
+        renderAll();
     </script>
 </body>
 </html>
