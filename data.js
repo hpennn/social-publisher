@@ -28,7 +28,7 @@ var CAMPAIGNS = [
         id: '20260714_ai-staff_img1',
         title: '小红书封面 - AI帮你赚钱',
         prompt: '现代简约风格的手机屏幕展示AI助手对话界面，屏幕上方飘浮金币和增长图表，背景使用柔和的紫色到蓝色渐变，画面干净有科技感，顶部标题文字"AI帮你赚钱"，底部小字"副业神器"，16:9比例',
-        image: null
+        image: 'images/20260714_aistaff.jpg'
       }
     ],
     videos: [
@@ -67,7 +67,7 @@ var CAMPAIGNS = [
         id: '20260714_doc-convert_img1',
         title: '小红书封面 - 文档转换',
         prompt: '清新的蓝白色调插画风格，一个学生开心地坐在书桌前，桌上放着笔记本电脑，屏幕显示文档转换界面，周围飘浮着PDF、Word、Excel文件图标和转换箭头，背景是简洁的书架，顶部标题文字"PDF转Word神器"，16:9比例',
-        image: null
+        image: 'images/20260714_docconvert.jpg'
       }
     ],
     videos: [
