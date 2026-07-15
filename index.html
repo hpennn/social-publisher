@@ -164,6 +164,8 @@
         .btn-jimeng:hover { opacity: 0.9; }
         .btn-publish { background: #07C160; color: #fff; }
         .btn-publish:hover { background: #06ad56; }
+        .btn-oneclick { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
+        .btn-oneclick:hover { opacity: 0.9; }
         .btn-img-gen { background: linear-gradient(135deg, #a855f7, #6366f1); color: #fff; }
         .btn-img-gen:hover { opacity: 0.9; }
 
@@ -250,13 +252,13 @@
         <div class="workflow-guide">
             <h4>📋 发布流程</h4>
             <div class="steps">
-                <div class="step"><span class="num">1</span> 选择内容，点击复制</div>
+                <div class="step"><span class="num">1</span> 点击「一键发布」</div>
                 <span class="arrow">→</span>
-                <div class="step"><span class="num">2</span> 打开平台发布页</div>
+                <div class="step"><span class="num">2</span> 平台自动打开，内容已复制</div>
                 <span class="arrow">→</span>
-                <div class="step"><span class="num">3</span> 粘贴内容，上传配图</div>
+                <div class="step"><span class="num">3</span> 在编辑区 Ctrl+V 粘贴</div>
                 <span class="arrow">→</span>
-                <div class="step"><span class="num">4</span> 点击「已发布」记录</div>
+                <div class="step"><span class="num">4</span> 回来点「已发布」记录</div>
             </div>
         </div>
 
@@ -350,6 +352,26 @@
             window.open('https://jimeng.jianying.com/', '_blank');
         }
 
+        function publishToPlatform(content, platformName) {
+            const p = PLATFORMS[platformName];
+            if (!p) { showToast('❌ 未找到平台信息'); return; }
+            navigator.clipboard.writeText(content).then(() => {
+                window.open(p.url, '_blank');
+                showToast('✅ 内容已复制，在打开的页面按 Ctrl+V 粘贴');
+            }).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = content;
+                ta.style.position = 'fixed';
+                ta.style.left = '-9999px';
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                window.open(p.url, '_blank');
+                showToast('✅ 内容已复制，在打开的页面按 Ctrl+V 粘贴');
+            });
+        }
+
         function markPublished(el) {
             const badge = el.querySelector('.status-badge');
             if (badge) {
@@ -414,8 +436,8 @@
                             <div style="font-weight:600;font-size:14px;margin-bottom:8px;color:#333;">${t.title}</div>
                             <div class="text-content">${t.content}</div>
                             <div class="actions">
-                                <button class="btn btn-primary" onclick="copyText(\`${t.content.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, this)">📋 复制内容</button>
-                                <button class="btn btn-platform" style="background:${p.color || '#667eea'}" onclick="openPlatform('${t.platform}')">${p.icon || '🔗'} 打开${t.platformName}</button>
+                                <button class="btn btn-oneclick" onclick="publishToPlatform(\`${t.content.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, '${t.platform}')">⚡ 一键发布到${t.platformName}</button>
+                                <button class="btn btn-secondary" onclick="copyText(\`${t.content.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, this)">📋 仅复制</button>
                                 <button class="btn btn-publish" onclick="markPublished(this.closest('.card'))">✅ 已发布</button>
                             </div>
                         </div>
@@ -463,6 +485,7 @@
                                 ${img.prompt}
                             </div>
                             <div class="actions">
+                                <button class="btn btn-oneclick" onclick="publishToPlatform(\`${img.prompt.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, 'xiaohongshu')">⚡ 一键发布到小红书</button>
                                 <button class="btn btn-img-gen" onclick="copyText(\`${img.prompt.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, this)">📋 复制提示词去生成</button>
                                 ${hasImage ? `<button class="btn btn-primary" onclick="copyText('image', this)">📋 复制图片</button>` : ''}
                                 <button class="btn btn-secondary" onclick="openJimeng()">🎨 打开即梦</button>
@@ -504,6 +527,7 @@
                             <div class="script-box">${formattedScript}</div>
                             <div class="platform-hint">💡 复制脚本后粘贴到即梦，生成AI视频</div>
                             <div class="actions">
+                                <button class="btn btn-oneclick" onclick="publishToPlatform(\`${v.script.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, 'douyin')">⚡ 一键发布到抖音</button>
                                 <button class="btn btn-jimeng" onclick="copyScript(\`${v.script.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, this)">📋 复制脚本</button>
                                 <button class="btn btn-jimeng" onclick="openJimeng()">🎬 打开即梦生成视频</button>
                             </div>
