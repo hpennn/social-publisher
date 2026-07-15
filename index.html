@@ -252,14 +252,19 @@
         <div class="workflow-guide">
             <h4>📋 发布流程</h4>
             <div class="steps">
-                <div class="step"><span class="num">1</span> 点击「一键发布」</div>
+                <div class="step"><span class="num">1</span> 点击「一键填写」</div>
                 <span class="arrow">→</span>
-                <div class="step"><span class="num">2</span> 平台自动打开，内容已复制</div>
+                <div class="step"><span class="num">2</span> 平台自动打开并填入内容</div>
                 <span class="arrow">→</span>
-                <div class="step"><span class="num">3</span> 在编辑区 Ctrl+V 粘贴</div>
-                <span class="arrow">→</span>
-                <div class="step"><span class="num">4</span> 回来点「已发布」记录</div>
+                <div class="step"><span class="num">3</span> 检查后直接发布</div>
             </div>
+        </div>
+
+        <div style="background:#EEF2FF;border:1px solid #C7D2FE;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#4338CA;">
+            💡 <strong>自动填写</strong>需要安装油猴脚本。
+            <a href="https://www.tampermonkey.net/" target="_blank" style="color:#4338CA;text-decoration:underline;">安装 Tampermonkey</a>
+            → 然后安装
+            <a href="auto-fill.user.js" style="color:#4338CA;text-decoration:underline;font-weight:600;">智能营销一键填写脚本</a>
         </div>
 
         <div class="filter-bar">
@@ -352,24 +357,45 @@
             window.open('https://jimeng.jianying.com/', '_blank');
         }
 
-        function publishToPlatform(content, platformName) {
-            const p = PLATFORMS[platformName];
-            if (!p) { showToast('❌ 未找到平台信息'); return; }
-            navigator.clipboard.writeText(content).then(() => {
-                window.open(p.url, '_blank');
-                showToast('✅ 内容已复制，在打开的页面按 Ctrl+V 粘贴');
-            }).catch(() => {
-                const ta = document.createElement('textarea');
-                ta.value = content;
-                ta.style.position = 'fixed';
-                ta.style.left = '-9999px';
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                window.open(p.url, '_blank');
-                showToast('✅ 内容已复制，在打开的页面按 Ctrl+V 粘贴');
-            });
+        function oneClickFill(title, content, platformKey) {
+            const PLATFORM_URLS = {
+                xiaohongshu: 'https://creator.xiaohongshu.com/publish/publish',
+                zhihu: 'https://www.zhihu.com/creator',
+                wechat: 'https://mp.weixin.qq.com/',
+                douyin: 'https://creator.douyin.com/creator-micro/content/upload',
+                bilibili: 'https://member.bilibili.com/platform/upload-text',
+                weibo: 'https://service.weibo.com/share/share.php',
+                toutiao: 'https://mp.toutiao.com/profile_v4/graphic/publish',
+                jike: 'https://web.okjike.com/',
+                qywechat: 'https://work.weixin.qq.com/'
+            };
+            const url = PLATFORM_URLS[platformKey];
+            if (!url) { showToast('❌ 未找到平台'); return; }
+
+            // 复制到剪贴板（备份）
+            navigator.clipboard.writeText(content).catch(() => {});
+
+            // 微博特殊处理：原生支持URL参数
+            if (platformKey === 'weibo') {
+                const shareUrl = url + '?title=' + encodeURIComponent((title ? title + '\n\n' : '') + content);
+                window.open(shareUrl, '_blank');
+                showToast('✅ 微博内容已预填');
+                return;
+            }
+
+            // 其他平台：通过URL hash + 油猴脚本
+            const payload = JSON.stringify({ title: title || '', content: content });
+            const fullUrl = url + '#smfill=' + encodeURIComponent(payload);
+
+            if (fullUrl.length > 1800) {
+                // 内容过长，降级为复制+打开
+                window.open(url, '_blank');
+                showToast('📋 内容过长已复制，请在平台页面 Ctrl+V 粘贴');
+                return;
+            }
+
+            window.open(fullUrl, '_blank');
+            showToast('✅ 正在打开平台，内容将自动填入（需安装油猴脚本）');
         }
 
         function markPublished(el) {
@@ -436,7 +462,7 @@
                             <div style="font-weight:600;font-size:14px;margin-bottom:8px;color:#333;">${t.title}</div>
                             <div class="text-content">${t.content}</div>
                             <div class="actions">
-                                <button class="btn btn-oneclick" onclick="publishToPlatform(\`${t.content.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, '${t.platform}')">⚡ 一键发布到${t.platformName}</button>
+                                <button class="btn btn-oneclick" onclick="oneClickFill(\`${t.title.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, \`${t.content.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, '${t.platform}')">⚡ 一键填写到${t.platformName}</button>
                                 <button class="btn btn-secondary" onclick="copyText(\`${t.content.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, this)">📋 仅复制</button>
                                 <button class="btn btn-publish" onclick="markPublished(this.closest('.card'))">✅ 已发布</button>
                             </div>
@@ -485,7 +511,7 @@
                                 ${img.prompt}
                             </div>
                             <div class="actions">
-                                <button class="btn btn-oneclick" onclick="publishToPlatform(\`${img.prompt.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, 'xiaohongshu')">⚡ 一键发布到小红书</button>
+                                <button class="btn btn-oneclick" onclick="oneClickFill(\`${img.title.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, \`${img.prompt.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, 'xiaohongshu')">⚡ 一键填写到小红书</button>
                                 <button class="btn btn-img-gen" onclick="copyText(\`${img.prompt.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, this)">📋 复制提示词去生成</button>
                                 ${hasImage ? `<button class="btn btn-primary" onclick="copyText('image', this)">📋 复制图片</button>` : ''}
                                 <button class="btn btn-secondary" onclick="openJimeng()">🎨 打开即梦</button>
@@ -527,7 +553,7 @@
                             <div class="script-box">${formattedScript}</div>
                             <div class="platform-hint">💡 复制脚本后粘贴到即梦，生成AI视频</div>
                             <div class="actions">
-                                <button class="btn btn-oneclick" onclick="publishToPlatform(\`${v.script.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, 'douyin')">⚡ 一键发布到抖音</button>
+                                <button class="btn btn-oneclick" onclick="oneClickFill(\`${v.title.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, \`${v.script.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, 'douyin')">⚡ 一键填写到抖音</button>
                                 <button class="btn btn-jimeng" onclick="copyScript(\`${v.script.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, this)">📋 复制脚本</button>
                                 <button class="btn btn-jimeng" onclick="openJimeng()">🎬 打开即梦生成视频</button>
                             </div>
