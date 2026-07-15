@@ -21,6 +21,20 @@ var CAMPAIGNS = [
         platformName: '知乎',
         title: '有没有什么工具可以让小团队自动化运营？',
         content: '推荐一个我正在用的工具：**AI智能员工**（www.zhinenti.cn）\n\n它本质上是一个AI Agent平台，但做了一些很实用的封装：\n\n1. **自动化工作流**：可以设置定时任务，比如每天早上自动抓取行业数据、生成日报\n2. **多模态能力**：不只是文字，还能做PPT、处理文档、生成图片\n3. **API集成**：可以对接各种第三方服务\n\n我用它搭了3个自动化流程：\n- 每日竞品监控 → 自动生成分析报告\n- 客户咨询 → AI预处理 + 人工复核\n- 内容创作 → 自动生成初稿 → 一键发布\n\n小团队用这个，至少省2个人力成本。\n\n免费试用地址：www.zhinenti.cn'
+      },
+      {
+        id: '20260714_ai-staff_toutiao',
+        platform: 'toutiao',
+        platformName: '头条号',
+        title: 'AI时代来了！这个工具让普通人也能24小时自动赚钱',
+        content: '最近发现一个很厉害的AI工具——AI智能员工。\n\n它能做什么？\n1. 自动写文案、做PPT、处理文档\n2. 24小时在线接单，帮你完成各种工作\n3. 支持自定义工作流，就像雇了一个真人助手\n\n我靠它接了好几单文案撰写，月入多了3000多块。\n\n最关键的是：注册就能用，零门槛！\n\n👉 www.zhinenti.cn\n\n#AI工具 #副业赚钱 #效率神器 #打工人必备'
+      },
+      {
+        id: '20260714_ai-staff_weibo',
+        platform: 'weibo',
+        platformName: '微博',
+        title: 'AI智能员工 - 24小时帮你赚钱',
+        content: '🔥 发现一个宝藏工具——AI智能员工！\n\n✅ 自动写文案、做PPT\n✅ 24小时在线接单\n✅ 自定义工作流\n\n靠它月入3000+ 💰 注册就能用！\n\n👉 www.zhinenti.cn\n\n#AI工具 #副业赚钱 #效率神器'
       }
     ],
     images: [
@@ -60,6 +74,20 @@ var CAMPAIGNS = [
         platformName: '抖音/短视频',
         title: '3秒搞定文档转换',
         content: '你还在花钱买PDF转换会员？\n\n这个免费工具直接搞定 👇\n\nPDF转Word ✅ 格式不乱\nWord转PDF ✅ 一键完成\n扫描件识别 ✅ 文字秒出\n批量处理 ✅ 效率翻倍\n\nconvert.hpenn.xyz\n\n学生党、打工人必备！先收藏 ⭐'
+      },
+      {
+        id: '20260714_doc-convert_zhihu',
+        platform: 'zhihu',
+        platformName: '知乎',
+        title: '有什么免费的PDF转Word工具推荐？',
+        content: '推荐一个我用了大半年的免费工具：convert.hpenn.xyz\n\n特点：\n1. **格式保留完整** — 表格、公式、图片都不会乱\n2. **支持格式多** — PDF/Word/Excel/PPT/图片 互转\n3. **OCR识别** — 扫描件也能识别文字\n4. **完全免费** — 没有水印、没有次数限制\n\n适合学生党（论文改格式）、打工人（合同/报告处理）\n\n👉 convert.hpenn.xyz'
+      },
+      {
+        id: '20260714_doc-convert_toutiao',
+        platform: 'toutiao',
+        platformName: '头条号',
+        title: '免费PDF转Word工具，再也不用花钱买会员了',
+        content: '分享一个免费的文档转换工具：convert.hpenn.xyz\n\n支持的功能：\n1. PDF转Word — 格式完美保留\n2. Word转PDF — 一键完成\n3. Excel/PPT互转\n4. 扫描件OCR识别\n\n最关键的是完全免费，没有水印，没有次数限制。\n\n学生党和打工人必备！\n\n👉 convert.hpenn.xyz'
       }
     ],
     images: [
@@ -82,12 +110,15 @@ var CAMPAIGNS = [
   }
 ];
 
-// 平台跳转配置
+// 平台跳转配置（9大平台）
 var PLATFORMS = {
   xiaohongshu: { name: '小红书', icon: '📕', color: '#FF2442', url: 'https://creator.xiaohongshu.com/publish/publish' },
   zhihu: { name: '知乎', icon: '📘', color: '#0066FF', url: 'https://www.zhihu.com/creator' },
   douyin: { name: '抖音', icon: '🎵', color: '#111', url: 'https://creator.douyin.com/creator-micro/content/upload' },
   wechat: { name: '公众号', icon: '💬', color: '#07C160', url: 'https://mp.weixin.qq.com/' },
   bilibili: { name: 'B站', icon: '📺', color: '#FB7299', url: 'https://member.bilibili.com/platform/upload/text' },
-  weibo: { name: '微博', icon: '📢', color: '#E6162D', url: 'https://weibo.com' }
+  weibo: { name: '微博', icon: '📢', color: '#E6162D', url: 'https://weibo.com' },
+  toutiao: { name: '头条', icon: '📰', color: '#F85959', url: 'https://mp.toutiao.com/profile_v4/graphic/publish' },
+  jike: { name: '即刻', icon: '🟡', color: '#FFE411', url: 'https://web.okjike.com/' },
+  qywechat: { name: '企业微信', icon: '💼', color: '#2B7CE9', url: 'https://work.weixin.qq.com/' }
 };

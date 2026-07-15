@@ -168,6 +168,8 @@
         .btn-oneclick:hover { opacity: 0.9; }
         .btn-img-gen { background: linear-gradient(135deg, #a855f7, #6366f1); color: #fff; }
         .btn-img-gen:hover { opacity: 0.9; }
+        .btn-batch { background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; }
+        .btn-batch:hover { opacity: 0.9; }
 
         /* Status */
         .status-badge {
@@ -226,6 +228,69 @@
             font-size: 13px; background: #fff;
         }
 
+        /* Multi-publish tab */
+        .batch-section { margin-bottom: 24px; }
+        .batch-card {
+            background: #fff; border-radius: 14px; padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 16px;
+        }
+        .batch-card h3 {
+            font-size: 16px; color: #333; margin-bottom: 4px;
+        }
+        .batch-card .meta {
+            font-size: 12px; color: #999; margin-bottom: 12px;
+        }
+        .batch-card .preview {
+            background: #fafafa; border-radius: 8px; padding: 12px;
+            font-size: 13px; line-height: 1.7; color: #555;
+            max-height: 120px; overflow-y: auto;
+            border: 1px solid #f0f0f0; margin-bottom: 14px;
+        }
+        .platform-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+            margin-bottom: 14px;
+        }
+        .platform-check {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 10px; border-radius: 8px;
+            border: 2px solid #eee; cursor: pointer;
+            font-size: 13px; transition: all 0.15s;
+            user-select: none;
+        }
+        .platform-check:hover { border-color: #667eea; background: #f8f7ff; }
+        .platform-check.checked { border-color: #667eea; background: #EEF2FF; }
+        .platform-check input { display: none; }
+        .platform-check .check-icon {
+            width: 18px; height: 18px; border-radius: 4px;
+            border: 2px solid #ddd; display: flex; align-items: center;
+            justify-content: center; font-size: 11px; color: #fff;
+            transition: all 0.15s; flex-shrink: 0;
+        }
+        .platform-check.checked .check-icon {
+            background: #667eea; border-color: #667eea;
+        }
+        .platform-check .p-name { font-weight: 500; }
+        .batch-btn-row {
+            display: flex; gap: 10px; align-items: center;
+        }
+        .batch-btn-row .btn { font-size: 14px; padding: 10px 20px; }
+        .batch-count {
+            font-size: 12px; color: #999;
+        }
+
+        /* Per-card platform selector */
+        .card-platforms {
+            display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px;
+        }
+        .mini-plat {
+            padding: 4px 8px; border-radius: 6px; font-size: 11px;
+            cursor: pointer; border: 1px solid #eee; background: #fafafa;
+            transition: all 0.15s; display: inline-flex; align-items: center; gap: 3px;
+        }
+        .mini-plat:hover { border-color: #667eea; background: #EEF2FF; }
+        .mini-plat.selected { border-color: #667eea; background: #667eea; color: #fff; }
+
         /* Responsive */
         @media (max-width: 640px) {
             .container { padding: 12px; }
@@ -238,6 +303,8 @@
             .workflow-guide .steps { flex-direction: column; gap: 8px; }
             .workflow-guide .arrow { display: none; }
             .filter-bar { flex-direction: column; }
+            .platform-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+            .platform-check { padding: 6px 8px; font-size: 12px; }
         }
     </style>
 </head>
@@ -245,18 +312,18 @@
     <div class="container">
         <div class="header">
             <h1>📢 内容发布助手</h1>
-            <p>每日推广内容一站式管理 · 复制→发布→记录</p>
+            <p>每日推广内容一站式管理 · 三合一同步发布 · 一键多平台</p>
             <div class="stats" id="stats"></div>
         </div>
 
         <div class="workflow-guide">
             <h4>📋 发布流程</h4>
             <div class="steps">
-                <div class="step"><span class="num">1</span> 点击「一键填写」</div>
+                <div class="step"><span class="num">1</span> 选择内容</div>
                 <span class="arrow">→</span>
-                <div class="step"><span class="num">2</span> 平台自动打开并填入内容</div>
+                <div class="step"><span class="num">2</span> 勾选3个平台</div>
                 <span class="arrow">→</span>
-                <div class="step"><span class="num">3</span> 检查后直接发布</div>
+                <div class="step"><span class="num">3</span> 一键三合发布</div>
             </div>
         </div>
 
@@ -283,7 +350,7 @@
                     </div>
                     <div style="display:flex;align-items:flex-start;gap:10px;">
                         <span style="background:#667eea;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">3</span>
-                        <div>完成后回来点击「一键填写」即可自动填入内容 ✨</div>
+                        <div>完成后回来点击「一键填写」或「三合发布」即可自动填入内容 ✨</div>
                     </div>
                 </div>
                 <div style="display:flex;gap:10px;">
@@ -305,14 +372,16 @@
         </div>
 
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('text')">📝 文案内容 <span class="count" id="textCount">0</span></button>
-            <button class="tab" onclick="switchTab('image')">🖼️ 图文配图 <span class="count" id="imageCount">0</span></button>
-            <button class="tab" onclick="switchTab('video')">🎬 视频脚本 <span class="count" id="videoCount">0</span></button>
+            <button class="tab active" onclick="switchTab('text', this)">📝 文案内容 <span class="count" id="textCount">0</span></button>
+            <button class="tab" onclick="switchTab('image', this)">🖼️ 图文配图 <span class="count" id="imageCount">0</span></button>
+            <button class="tab" onclick="switchTab('video', this)">🎬 视频脚本 <span class="count" id="videoCount">0</span></button>
+            <button class="tab" onclick="switchTab('batch', this)">🚀 批量发布 <span class="count" id="batchCount">0</span></button>
         </div>
 
         <div id="textContent" class="tab-content active"></div>
         <div id="imageContent" class="tab-content"></div>
         <div id="videoContent" class="tab-content"></div>
+        <div id="batchContent" class="tab-content"></div>
     </div>
 
     <div class="toast" id="toast"></div>
@@ -321,11 +390,14 @@
     <script>
         let currentTab = 'text';
 
-        function switchTab(tab) {
+        // 批量发布选择状态
+        let batchSelections = {}; // { campaignId_textIdx: Set<platformKey> }
+
+        function switchTab(tab, btnEl) {
             currentTab = tab;
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            btnEl.classList.add('active');
             document.getElementById(tab + 'Content').classList.add('active');
         }
 
@@ -333,18 +405,18 @@
             const t = document.getElementById('toast');
             t.textContent = msg;
             t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2000);
+            setTimeout(() => t.classList.remove('show'), 2500);
         }
 
         function copyText(text, btn) {
             navigator.clipboard.writeText(text).then(() => {
                 showToast('✅ 已复制到剪贴板');
                 if (btn) {
-                    btn.textContent = '✅ 已复制';
-                    setTimeout(() => { btn.textContent = '📋 复制内容'; }, 2000);
+                    const orig = btn.innerHTML;
+                    btn.innerHTML = '✅ 已复制';
+                    setTimeout(() => btn.innerHTML = orig, 2000);
                 }
             }).catch(() => {
-                // Fallback
                 const ta = document.createElement('textarea');
                 ta.value = text;
                 document.body.appendChild(ta);
@@ -361,7 +433,7 @@
                 if (btn) {
                     const orig = btn.innerHTML;
                     btn.innerHTML = '✅ 已复制';
-                    setTimeout(() => { btn.innerHTML = orig; }, 2000);
+                    setTimeout(() => btn.innerHTML = orig, 2000);
                 }
             }).catch(() => {
                 const ta = document.createElement('textarea');
@@ -374,34 +446,14 @@
             });
         }
 
-        function openPlatform(platform) {
-            const p = PLATFORMS[platform];
-            if (p) window.open(p.url, '_blank');
-        }
-
-        function openJimeng() {
-            window.open('https://jimeng.jianying.com/', '_blank');
-        }
-
+        // ========== 核心：单平台一键填写 ==========
         function oneClickFill(title, content, platformKey) {
-            const PLATFORM_URLS = {
-                xiaohongshu: 'https://creator.xiaohongshu.com/publish/publish',
-                zhihu: 'https://www.zhihu.com/creator',
-                wechat: 'https://mp.weixin.qq.com/',
-                douyin: 'https://creator.douyin.com/creator-micro/content/upload',
-                bilibili: 'https://member.bilibili.com/platform/upload-text',
-                weibo: 'https://service.weibo.com/share/share.php',
-                toutiao: 'https://mp.toutiao.com/profile_v4/graphic/publish',
-                jike: 'https://web.okjike.com/',
-                qywechat: 'https://work.weixin.qq.com/'
-            };
-            const url = PLATFORM_URLS[platformKey];
+            const url = (PLATFORMS[platformKey] || {}).url;
             if (!url) { showToast('❌ 未找到平台'); return; }
 
-            // 复制到剪贴板（备份）
             navigator.clipboard.writeText(content).catch(() => {});
 
-            // 微博特殊处理：原生支持URL参数
+            // 微博：原生URL参数
             if (platformKey === 'weibo') {
                 const shareUrl = url + '?title=' + encodeURIComponent((title ? title + '\n\n' : '') + content);
                 window.open(shareUrl, '_blank');
@@ -409,19 +461,119 @@
                 return;
             }
 
-            // 其他平台：通过URL hash + 油猴脚本
+            // 其他平台：URL hash + 油猴脚本
             const payload = JSON.stringify({ title: title || '', content: content });
             const fullUrl = url + '#smfill=' + encodeURIComponent(payload);
 
             if (fullUrl.length > 1800) {
-                // 内容过长，降级为复制+打开
                 window.open(url, '_blank');
                 showToast('📋 内容过长已复制，请在平台页面 Ctrl+V 粘贴');
                 return;
             }
 
+            checkScriptInstall();
             window.open(fullUrl, '_blank');
-            showToast('✅ 正在打开平台，内容将自动填入（需安装油猴脚本）');
+            showToast('✅ 正在打开 ' + (PLATFORMS[platformKey]?.name || platformKey));
+        }
+
+        // ========== 核心：三合批量发布 ==========
+        function batchPublish(selKey) {
+            const sel = batchSelections[selKey];
+            if (!sel || sel.size === 0) {
+                showToast('⚠️ 请至少勾选一个平台');
+                return;
+            }
+
+            // 解析 selKey 获取内容
+            const parts = selKey.split('_');
+            const campaignId = parts[0] + '_' + parts[1];
+            const textIdx = parseInt(parts[2]);
+            const campaign = CAMPAIGNS.find(c => c.id === campaignId);
+            if (!campaign || !campaign.texts[textIdx]) { showToast('❌ 内容未找到'); return; }
+            const textItem = campaign.texts[textIdx];
+            const title = textItem.title;
+            const content = textItem.content;
+
+            navigator.clipboard.writeText(content).catch(() => {});
+            checkScriptInstall();
+
+            const platforms = Array.from(sel);
+            let opened = 0;
+            platforms.forEach((pk, i) => {
+                const p = PLATFORMS[pk];
+                if (!p) return;
+
+                setTimeout(() => {
+                    if (pk === 'weibo') {
+                        const shareUrl = p.url + '?title=' + encodeURIComponent((title ? title + '\n\n' : '') + content);
+                        window.open(shareUrl, '_blank');
+                    } else {
+                        const payload = JSON.stringify({ title: title || '', content: content });
+                        const fullUrl = p.url + '#smfill=' + encodeURIComponent(payload);
+                        if (fullUrl.length > 1800) {
+                            window.open(p.url, '_blank');
+                        } else {
+                            window.open(fullUrl, '_blank');
+                        }
+                    }
+                    opened++;
+                }, i * 300); // 间隔300ms防止浏览器拦截
+            });
+
+            showToast('🚀 正在打开 ' + platforms.length + ' 个平台，请逐个检查发布');
+
+            // 标记已发布
+            const card = document.getElementById('batch-' + selKey);
+            if (card) {
+                const badge = card.querySelector('.status-badge');
+                if (badge) {
+                    badge.className = 'status-badge status-done';
+                    badge.textContent = '✅ 已发布';
+                }
+            }
+        }
+
+        // 平台勾选切换
+        function toggleBatchPlatform(selKey, platformKey, el) {
+            if (!batchSelections[selKey]) batchSelections[selKey] = new Set();
+            const sel = batchSelections[selKey];
+            if (sel.has(platformKey)) {
+                sel.delete(platformKey);
+                el.classList.remove('checked');
+            } else {
+                sel.add(platformKey);
+                el.classList.add('checked');
+            }
+            // 更新计数
+            const countEl = document.getElementById('batch-count-' + selKey);
+            if (countEl) countEl.textContent = sel.size + ' 个平台';
+        }
+
+        // 快速勾选默认3平台
+        function quickSelect3(selKey) {
+            const defaults = ['xiaohongshu', 'zhihu', 'douyin'];
+            if (!batchSelections[selKey]) batchSelections[selKey] = new Set();
+            const sel = batchSelections[selKey];
+            defaults.forEach(pk => sel.add(pk));
+            // 更新UI
+            const container = document.getElementById('batch-plats-' + selKey);
+            if (container) {
+                container.querySelectorAll('.platform-check').forEach(el => {
+                    const pk = el.dataset.platform;
+                    if (defaults.includes(pk)) {
+                        el.classList.add('checked');
+                    }
+                });
+            }
+            const countEl = document.getElementById('batch-count-' + selKey);
+            if (countEl) countEl.textContent = sel.size + ' 个平台';
+            showToast('✅ 已默认选中 小红书 + 知乎 + 抖音');
+        }
+
+        function checkScriptInstall() {
+            if (!localStorage.getItem('sm_script_installed')) {
+                showInstallModal();
+            }
         }
 
         function markPublished(el) {
@@ -434,9 +586,8 @@
             showToast('🎉 已标记为发布完成');
         }
 
-        function openPublishPage(platform) {
-            const p = PLATFORMS[platform];
-            if (p) window.open(p.url, '_blank');
+        function openJimeng() {
+            window.open('https://jimeng.jianying.com/', '_blank');
         }
 
         function getFilteredCampaigns() {
@@ -467,6 +618,20 @@
             return `<span class="platform-tag" style="background:${color}15;color:${color}">${p.icon || '📄'} ${platformName || platform}</span>`;
         }
 
+        // 每条文案下面的快速多平台按钮
+        function getMiniPlatformSelector(title, content, textId) {
+            const platKeys = Object.keys(PLATFORMS);
+            let html = '<div class="card-platforms">';
+            platKeys.forEach(pk => {
+                const p = PLATFORMS[pk];
+                html += `<span class="mini-plat" onclick="oneClickFill(\`${title.replace(/`/g,'\\`').replace(/\\/g,'\\\\')}\`, \`${content.replace(/`/g,'\\`').replace(/\\/g,'\\\\')}\`, '${pk}')" title="填写到${p.name}">${p.icon} ${p.name}</span>`;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        // ========== 渲染函数 ==========
+
         function renderText() {
             const campaigns = getFilteredCampaigns();
             const container = document.getElementById('textContent');
@@ -476,9 +641,9 @@
             campaigns.forEach(c => {
                 if (!c.texts || c.texts.length === 0) return;
                 html += `<div class="campaign-section">${getCampaignHeader(c)}`;
-                c.texts.forEach(t => {
+                c.texts.forEach((t, idx) => {
                     total++;
-                    const p = PLATFORMS[t.platform] || {};
+                    const selKey = c.id.replace(/-/g,'_') + '_' + idx;
                     html += `
                         <div class="card" id="text-${t.id}">
                             <div class="card-head">
@@ -488,10 +653,11 @@
                             <div style="font-weight:600;font-size:14px;margin-bottom:8px;color:#333;">${t.title}</div>
                             <div class="text-content">${t.content}</div>
                             <div class="actions">
-                                <button class="btn btn-oneclick" onclick="oneClickFill(\`${t.title.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, \`${t.content.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, '${t.platform}')">⚡ 一键填写到${t.platformName}</button>
-                                <button class="btn btn-secondary" onclick="copyText(\`${t.content.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, this)">📋 仅复制</button>
+                                <button class="btn btn-oneclick" onclick="oneClickFill(\`${t.title.replace(/`/g,'\\`').replace(/\\/g,'\\\\')}\`, \`${t.content.replace(/`/g,'\\`').replace(/\\/g,'\\\\')}\`, '${t.platform}')">⚡ 一键填写到${t.platformName}</button>
+                                <button class="btn btn-secondary" onclick="copyText(\`${t.content.replace(/`/g,'\\`').replace(/\\/g,'\\\\')}\`, this)">📋 仅复制</button>
                                 <button class="btn btn-publish" onclick="markPublished(this.closest('.card'))">✅ 已发布</button>
                             </div>
+                            ${getMiniPlatformSelector(t.title, t.content, t.id)}
                         </div>
                     `;
                 });
@@ -537,8 +703,8 @@
                                 ${img.prompt}
                             </div>
                             <div class="actions">
-                                <button class="btn btn-oneclick" onclick="oneClickFill(\`${img.title.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, \`${img.prompt.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, 'xiaohongshu')">⚡ 一键填写到小红书</button>
-                                <button class="btn btn-img-gen" onclick="copyText(\`${img.prompt.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, this)">📋 复制提示词去生成</button>
+                                <button class="btn btn-oneclick" onclick="oneClickFill(\`${img.title.replace(/`/g,'\\`').replace(/\\/g,'\\\\')}\`, \`${img.prompt.replace(/`/g,'\\`').replace(/\\/g,'\\\\')}\`, 'xiaohongshu')">⚡ 一键填写到小红书</button>
+                                <button class="btn btn-img-gen" onclick="copyText(\`${img.prompt.replace(/`/g,'\\`').replace(/\\/g,'\\\\')}\`, this)">📋 复制提示词去生成</button>
                                 ${hasImage ? `<button class="btn btn-primary" onclick="copyText('image', this)">📋 复制图片</button>` : ''}
                                 <button class="btn btn-secondary" onclick="openJimeng()">🎨 打开即梦</button>
                             </div>
@@ -566,7 +732,6 @@
                 html += `<div class="campaign-section">${getCampaignHeader(c)}`;
                 c.videos.forEach(v => {
                     total++;
-                    // Format script with scene highlights
                     let formattedScript = v.script
                         .replace(/【(.*?)】/g, '<span class="scene">【$1】</span>');
 
@@ -579,8 +744,8 @@
                             <div class="script-box">${formattedScript}</div>
                             <div class="platform-hint">💡 复制脚本后粘贴到即梦，生成AI视频</div>
                             <div class="actions">
-                                <button class="btn btn-oneclick" onclick="oneClickFill(\`${v.title.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, \`${v.script.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, 'douyin')">⚡ 一键填写到抖音</button>
-                                <button class="btn btn-jimeng" onclick="copyScript(\`${v.script.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, this)">📋 复制脚本</button>
+                                <button class="btn btn-oneclick" onclick="oneClickFill(\`${v.title.replace(/`/g,'\\`').replace(/\\/g,'\\\\')}\`, \`${v.script.replace(/`/g,'\\`').replace(/\\/g,'\\\\')}\`, 'douyin')">⚡ 一键填写到抖音</button>
+                                <button class="btn btn-jimeng" onclick="copyScript(\`${v.script.replace(/`/g,'\\`').replace(/\\/g,'\\\\')}\`, this)">📋 复制脚本</button>
                                 <button class="btn btn-jimeng" onclick="openJimeng()">🎬 打开即梦生成视频</button>
                             </div>
                         </div>
@@ -596,10 +761,83 @@
             document.getElementById('videoCount').textContent = total;
         }
 
+        // ========== 批量发布Tab ==========
+        function renderBatch() {
+            const campaigns = getFilteredCampaigns();
+            const container = document.getElementById('batchContent');
+            let html = '';
+            let total = 0;
+
+            // 说明卡片
+            html += `
+                <div style="background:linear-gradient(135deg,#667eea11,#764ba211);border:1px solid #667eea33;border-radius:12px;padding:16px 20px;margin-bottom:20px;">
+                    <div style="font-size:15px;font-weight:600;color:#333;margin-bottom:6px;">🚀 三合一批量发布</div>
+                    <div style="font-size:13px;color:#666;line-height:1.6;">
+                        选择一条内容，勾选要发布的平台（推荐3个），点击「三合发布」即可同时打开多个平台页面并自动填入内容。
+                        <br>💡 默认推荐：小红书 + 知乎 + 抖音
+                    </div>
+                </div>
+            `;
+
+            campaigns.forEach(c => {
+                if (!c.texts || c.texts.length === 0) return;
+                html += `<div class="batch-section">${getCampaignHeader(c)}`;
+
+                c.texts.forEach((t, idx) => {
+                    total++;
+                    const selKey = c.id.replace(/-/g,'_') + '_' + idx;
+                    const platKeys = Object.keys(PLATFORMS);
+
+                    html += `
+                        <div class="batch-card" id="batch-${selKey}">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                                <h3>${getPlatformTag(t.platform, t.platformName)} ${t.title}</h3>
+                                <span class="status-badge status-pending">待发布</span>
+                            </div>
+                            <div class="meta">${c.project} · ${c.date}</div>
+                            <div class="preview">${t.content.substring(0, 200)}${t.content.length > 200 ? '...' : ''}</div>
+                            <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:8px;">选择发布平台：</div>
+                            <div class="platform-grid" id="batch-plats-${selKey}">
+                    `;
+
+                    platKeys.forEach(pk => {
+                        const p = PLATFORMS[pk];
+                        html += `
+                            <div class="platform-check" data-platform="${pk}" onclick="toggleBatchPlatform('${selKey}', '${pk}', this)">
+                                <span class="check-icon">✓</span>
+                                <span>${p.icon}</span>
+                                <span class="p-name">${p.name}</span>
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                            </div>
+                            <div class="batch-btn-row">
+                                <button class="btn btn-batch" onclick="batchPublish('${selKey}')">🚀 三合发布</button>
+                                <button class="btn btn-secondary" onclick="quickSelect3('${selKey}')">⚡ 默认3平台</button>
+                                <button class="btn btn-secondary" onclick="copyText(\`${t.content.replace(/`/g,'\\`').replace(/\\/g,'\\\\')}\`, this)">📋 复制</button>
+                                <span class="batch-count" id="batch-count-${selKey}">0 个平台</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+            });
+
+            if (total === 0) {
+                html += '<div class="empty-state"><div class="icon">🚀</div><p>暂无可发布内容</p></div>';
+            }
+            container.innerHTML = html;
+            document.getElementById('batchCount').textContent = total;
+        }
+
         function renderAll() {
             renderText();
             renderImages();
             renderVideos();
+            renderBatch();
             updateStats();
             updateFilters();
         }
@@ -615,6 +853,7 @@
                 <span>📝 ${totalText} 条文案</span>
                 <span>🖼️ ${totalImg} 张配图</span>
                 <span>🎬 ${totalVideo} 个脚本</span>
+                <span>📢 9大平台</span>
             `;
         }
 
@@ -648,14 +887,7 @@
             document.getElementById('install-modal').style.display = 'none';
             if (dontShowAgain) localStorage.setItem('sm_script_installed', '1');
         }
-        // 首次点击一键填写时检查是否已安装
-        const origOneClickFill = oneClickFill;
-        oneClickFill = function(title, content, platformKey) {
-            if (!localStorage.getItem('sm_script_installed') && platformKey !== 'weibo') {
-                showInstallModal();
-            }
-            origOneClickFill(title, content, platformKey);
-        };
+
         // 恢复 banner 关闭状态
         if (localStorage.getItem('sm_hide_banner') === '1') {
             const b = document.getElementById('userscript-banner');
