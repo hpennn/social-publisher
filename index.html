@@ -260,11 +260,37 @@
             </div>
         </div>
 
-        <div style="background:#EEF2FF;border:1px solid #C7D2FE;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#4338CA;">
+        <div id="userscript-banner" style="background:#EEF2FF;border:1px solid #C7D2FE;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#4338CA;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             💡 <strong>自动填写</strong>需要安装油猴脚本。
-            <a href="https://www.tampermonkey.net/" target="_blank" style="color:#4338CA;text-decoration:underline;">安装 Tampermonkey</a>
-            → 然后安装
-            <a href="auto-fill.user.js" style="color:#4338CA;text-decoration:underline;font-weight:600;">智能营销一键填写脚本</a>
+            <a href="https://www.tampermonkey.net/" target="_blank" style="color:#4338CA;text-decoration:underline;">① 安装 Tampermonkey</a>
+            →
+            <a href="https://github.com/hpennn/smart-marketing/raw/main/auto-fill.user.js" target="_blank" style="color:#4338CA;text-decoration:underline;font-weight:600;">② 安装一键填写脚本</a>
+            <button onclick="document.getElementById('userscript-banner').style.display='none';localStorage.setItem('sm_hide_banner','1')" style="margin-left:auto;background:none;border:none;color:#4338CA;cursor:pointer;font-size:16px;">✕</button>
+        </div>
+
+        <!-- 油猴脚本安装引导弹窗 -->
+        <div id="install-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+            <div style="background:#fff;border-radius:16px;padding:28px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+                <h3 style="font-size:18px;font-weight:700;color:#333;margin-bottom:16px;">🐒 安装油猴脚本，启用自动填写</h3>
+                <div style="background:#f8fafc;border-radius:10px;padding:16px;margin-bottom:16px;">
+                    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;">
+                        <span style="background:#667eea;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">1</span>
+                        <div>安装 Tampermonkey 浏览器扩展<br><a href="https://www.tampermonkey.net/" target="_blank" style="color:#667eea;font-size:13px;">👉 点击安装 tampermonkey.net</a></div>
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;">
+                        <span style="background:#667eea;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">2</span>
+                        <div>安装一键填写脚本<br><a href="https://github.com/hpennn/smart-marketing/raw/main/auto-fill.user.js" target="_blank" style="color:#667eea;font-size:13px;">👉 点击安装脚本</a></div>
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:10px;">
+                        <span style="background:#667eea;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">3</span>
+                        <div>完成后回来点击「一键填写」即可自动填入内容 ✨</div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:10px;">
+                    <button onclick="closeInstallModal()" style="flex:1;padding:10px;border-radius:10px;border:1px solid #ddd;background:#fff;color:#666;font-size:14px;cursor:pointer;">我知道了</button>
+                    <button onclick="closeInstallModal(true)" style="flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:14px;cursor:pointer;font-weight:600;">不再提示</button>
+                </div>
+            </div>
         </div>
 
         <div class="filter-bar">
@@ -612,6 +638,28 @@
                 dateOpts += `<option value="${d}" ${d === currentDate ? 'selected' : ''}>${d}</option>`;
             });
             dateSelect.innerHTML = dateOpts;
+        }
+
+        // 油猴脚本安装弹窗
+        function showInstallModal() {
+            document.getElementById('install-modal').style.display = 'flex';
+        }
+        function closeInstallModal(dontShowAgain) {
+            document.getElementById('install-modal').style.display = 'none';
+            if (dontShowAgain) localStorage.setItem('sm_script_installed', '1');
+        }
+        // 首次点击一键填写时检查是否已安装
+        const origOneClickFill = oneClickFill;
+        oneClickFill = function(title, content, platformKey) {
+            if (!localStorage.getItem('sm_script_installed') && platformKey !== 'weibo') {
+                showInstallModal();
+            }
+            origOneClickFill(title, content, platformKey);
+        };
+        // 恢复 banner 关闭状态
+        if (localStorage.getItem('sm_hide_banner') === '1') {
+            const b = document.getElementById('userscript-banner');
+            if (b) b.style.display = 'none';
         }
 
         // Init
